@@ -155,7 +155,7 @@ chrome.tabs.onUpdated.addListener(function( tabId,  changeInfo,  tab) {
     //close this tab
     chrome.tabs.remove(tabId, function (){
       console.log('close token url');
-
+      alert('login success!')
     });
   }
 
