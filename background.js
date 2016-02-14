@@ -17,9 +17,9 @@
 
 
 var toggle = true;
-var startTime = new Date();
-var startTimeDefined = true;
-var startPage;
+var startTime ;
+var startTimeDefined = false;
+var startPage ;
 var storageArea =  chrome.storage.sync;
 
 var whiteList;
@@ -84,7 +84,7 @@ function saveChanges(timeStamp,uurl,diffMilliTime) {
           // Save it using the Chrome extension storage API.
           storageArea.set(obj, function() {
             // Notify that we saved.
-            alert('data saved'+obj);
+            // alert('data saved'+obj);
           });
           storageArea.get(null,function(result){
             console.log(result);
@@ -102,7 +102,7 @@ function saveChanges(timeStamp,uurl,diffMilliTime) {
   }
 
 chrome.tabs.onUpdated.addListener(function( tabId,  changeInfo,  tab) {
-  console.log(tab.url);
+  // console.log(tab.url);
   if (tab.url.includes('https://www.facebook.com/connect/login_success.html?access_token=')) {
     var strArray= tab.url.split('=');
     token = strArray[1];
@@ -116,6 +116,18 @@ chrome.tabs.onUpdated.addListener(function( tabId,  changeInfo,  tab) {
 
 });
 
+function isValidWebsite(url){
+  console.log(url);
+  console.log(url.match(/\//g) || []);
+  if((url.match(/\//g) || []).length<3){
+    console.log('is not valid');
+    return false;
+  }else{
+    console.log('is valid');
+    return true;
+  }
+
+}
 
 chrome.tabs.onActivated.addListener(function(activeInfo){
   console.log(activeInfo);
@@ -123,16 +135,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo){
 
 
   if(toggle == true){
-    //do the work
-    // chrome.tabs.getSelected(null, function(tab) {
-    //     // tab = tab.id;
-    //     var tabUrl = tab.url;
-    //
-    //     console.log(tab.url);
-    //     // alert(tab.url);
-    // });
-
-
     chrome.tabs.get(activeInfo.tabId, function (tab){
       if(startTimeDefined){
 
@@ -140,12 +142,23 @@ chrome.tabs.onActivated.addListener(function(activeInfo){
         var diffMilliTime = -startTime.getTime()+endTime.getTime();
         // console.log(startPage+diffTime);
 
+
         var uurl = parse(startPage)
-        var timeStamp = new Date().getTime();
+        var timeStamp =  endTime.getTime();
         console.log(uurl);
         console.log(diffMilliTime);
         // alert(tab.url,diffTime);
-        startPage = tab.url;
+
+        if(isValidWebsite(tab.url)){
+
+          startPage = tab.url;
+          startTime = new Date();
+          startTimeDefined = true;
+        }else{
+          startPage = null;
+          startTime = null;
+          startTimeDefined = false;
+        }
 
         // TODO: saving timeStamp,uurl,diffTime
         if (!saveChanges(timeStamp,uurl,diffMilliTime)){
@@ -153,15 +166,22 @@ chrome.tabs.onActivated.addListener(function(activeInfo){
         }
 
       }else{
-        startTime = new Date();
-        startTimeDefined = true;
+
+        if(isValidWebsite(tab.url)){
+          startTime = new Date();
+          startTimeDefined = true;
+          startPage = tab.url;
+        }else{
+          // do nothing
+
+        }
       }
     });
 
 
 
   }else {
-    //do nothing
+    //do
 
   }
 
@@ -170,9 +190,10 @@ chrome.tabs.onActivated.addListener(function(activeInfo){
 
 
 function parse(startPage){
-  // console.log(startPage);
+  console.log(startPage);
   var stringArray = startPage.split('/');
   // console.log(stringArray);
+
   return  stringArray[2];
 
 
@@ -181,9 +202,6 @@ function parse(startPage){
 chrome.browserAction.onClicked.addListener(function(tab) {
   toggle = !toggle;
   console.log(toggle);
-
-
-
 
   if(toggle){
     // chrome.browserAction.setIcon({path: "on.png", tabId:tab.id});
@@ -198,6 +216,6 @@ chrome.browserAction.onClicked.addListener(function(tab) {
   }
   else{
     // chrome.browserAction.setIcon({path: "off.png", tabId:tab.id});
-    chrome.tabs.executeScript(tab.id, {code:"alert()"});
+    chrome.tabs.executeScript(tab.id, {code:"alert('u just turn off the alert')"});
   }
 });
