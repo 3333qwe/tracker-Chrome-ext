@@ -25,6 +25,8 @@ var storageArea =  chrome.storage.sync;
 var whiteList;
 var blacList;
 
+var token = null;
+var isSync= false;
 
 storageArea.clear(function (){
 
@@ -42,46 +44,84 @@ function syncAfterLogin(){
 
 }
 
+function sendDataToServer(data){
+  console.log("sending data to server");
+  console.log(data);
+  $.post('http://procrastinationation.mybluemix.net/event',data, function(  data,  textStatus,  jqXHR ){
+    console.log(data);
+
+  });
+
+}
+
 
 function saveChanges(timeStamp,uurl,diffMilliTime) {
+
         var data = {};
-        data['timeStamp']=timeStamp;
+        data['timestamp']=timeStamp;
         data['url'] = uurl;
         data ['duration']= diffMilliTime;
 
-        var obj ={};
-        obj[timeStamp] = data;
-
-        console.log('data:'+data);
-        console.log('obj:'+obj);
-        // Save it using the Chrome extension storage API.
-
-
-
-
-
-
-        storageArea.set(obj, function() {
-          // Notify that we saved.
-          alert('data saved'+obj);
-
-        });
+        if (token != null ) {
+          //send it to the server
+          data['user_token']= token;
+          sendDataToServer(data);
+          if(isSync==false){
+            // TODO:
+            //send the local data to the server
+            isSync = true;
+          }
 
 
-        storageArea.get(null,function(result){
-          console.log(result);
-          //console output = myVariableKeyName {myTestVar:'my test var'}
-        });
+        }else{
+          //save it locally
+          data['user_token']=null;
+
+          var obj ={};
+          obj[timeStamp] = data;
+          console.log('data:'+data);
+          console.log('obj:'+obj);
+          // Save it using the Chrome extension storage API.
+          storageArea.set(obj, function() {
+            // Notify that we saved.
+            alert('data saved'+obj);
+          });
+          storageArea.get(null,function(result){
+            console.log(result);
+            //console output = myVariableKeyName {myTestVar:'my test var'}
+          });
+        }
+
+
+
+
 
 
 
         return true;
   }
 
+chrome.tabs.onUpdated.addListener(function( tabId,  changeInfo,  tab) {
+  console.log(tab.url);
+  if (tab.url.includes('https://www.facebook.com/connect/login_success.html?access_token=')) {
+    var strArray= tab.url.split('=');
+    token = strArray[1];
+    console.log('token success='+token);
+    //close this tab
+    chrome.tabs.remove(tabId, function (){
+      console.log('close token url');
+    });
+  }
+
+
+});
+
 
 chrome.tabs.onActivated.addListener(function(activeInfo){
   console.log(activeInfo);
   console.log(toggle);
+
+
   if(toggle == true){
     //do the work
     // chrome.tabs.getSelected(null, function(tab) {
@@ -141,16 +181,15 @@ function parse(startPage){
 chrome.browserAction.onClicked.addListener(function(tab) {
   toggle = !toggle;
   console.log(toggle);
+
+
+
+
   if(toggle){
     // chrome.browserAction.setIcon({path: "on.png", tabId:tab.id});
-
-
-
-
     chrome.tabs.getSelected(null, function(tab) {
         // tab = tab.id;
         var tabUrl = tab.url;
-
         console.log(tab.url);
         // alert(tab.url);
         startPage = tab.url;
