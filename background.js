@@ -16,7 +16,7 @@
 // });
 
 
-var toggle = false;
+var toggle = true;
 var startTime = new Date();
 var startTimeDefined = true;
 var startPage;
