@@ -1,3 +1,28 @@
+
+
+
+
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    console.log(sender.tab ?
+                "from a content script:" + sender.tab.url :
+                "from the extension");
+    var token = request.msg;
+
+    console.log(token);
+
+    // if (request.msg == "I get the token"){
+    //     // document.getElementById('loginButton').disabled=true;
+    //     var token =
+    // }
+/////////////////////////////////////////
+
+var  a = jQuery.post('http://procrastinationation.org/stats/ranking/1',{ user_token: token }, function(data, res) {
+  console.log(data.data);
+  //////
+})
+
+
 $(function () {
 
     function shuffle(array) {
@@ -123,3 +148,6 @@ $(function () {
      $('#container').highcharts(data);
      $('#pie-chart').highcharts(data1);
 });
+
+
+  });

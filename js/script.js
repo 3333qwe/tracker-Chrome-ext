@@ -26,6 +26,7 @@ chrome.runtime.onMessage.addListener(
                 "from the extension");
     if (request.msg == "I get the token"){
         document.getElementById('loginButton').disabled=true;
+
     }
 
   });

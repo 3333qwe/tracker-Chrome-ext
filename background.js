@@ -147,7 +147,7 @@ chrome.tabs.onUpdated.addListener(function( tabId,  changeInfo,  tab) {
     token = strArray[1];
 
     //send msg to the tab to disable the login button
-    chrome.runtime.sendMessage({msg: "I get the token"}, function(response) {
+    chrome.runtime.sendMessage({msg: token}, function(response) {
       console.log(response.farewell);
     });
 
