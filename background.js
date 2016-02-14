@@ -84,7 +84,7 @@ function sendDataToServer(data){
   console.log(data.url);
   console.log(data.timestamp);
   console.log(data.duration);
-  $.post('http://procrastinationation.mybluemix.net/event',data, function(  data,  textStatus,  jqXHR ){
+  $.post('http://procrastinationation.org/event',data, function(  data,  textStatus,  jqXHR ){
     console.log(data);
 
   });
@@ -145,10 +145,17 @@ chrome.tabs.onUpdated.addListener(function( tabId,  changeInfo,  tab) {
   if (tab.url.includes('https://www.facebook.com/connect/login_success.html?access_token=')) {
     var strArray= tab.url.split('=');
     token = strArray[1];
+
+    //send msg to the tab to disable the login button
+    chrome.runtime.sendMessage({msg: "I get the token"}, function(response) {
+      console.log(response.farewell);
+    });
+
     console.log('token success='+token);
     //close this tab
     chrome.tabs.remove(tabId, function (){
       console.log('close token url');
+
     });
   }
 
@@ -263,3 +270,21 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.executeScript(tab.id, {code:"alert('u just turn off the alert')"});
   }
 });
+
+
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    console.log(sender.tab ?
+                "from a content script:" + sender.tab.url :
+                "from the extension");
+    if (request.greeting == "isFbLogined?"){
+      if (token ==null) {
+
+          sendResponse({farewell: "no"});
+      }else{
+        sendResponse({farewell: "yes"});
+
+      }
+    }
+
+  });
