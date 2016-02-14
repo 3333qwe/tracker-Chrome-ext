@@ -6,12 +6,16 @@ document.getElementById('loginButton').addEventListener("click", function(){
 
 chrome.runtime.sendMessage({greeting: "isFbLogined?"}, function(response) {
   console.log(response.farewell);
-  if (response.farewell == "yes") {
+  if (response.farewell == "no") {
 
 
-        document.getElementById('loginButton').disabled=true;
+
   }else{
       //do nothing
+      var token = response.farewell;
+      console.log(token);
+      document.getElementById('loginButton').disabled=true;
+
   }
 });
 

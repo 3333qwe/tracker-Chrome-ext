@@ -282,9 +282,10 @@ chrome.runtime.onMessage.addListener(
 
           sendResponse({farewell: "no"});
       }else{
-        sendResponse({farewell: "yes"});
+        sendResponse({farewell: token});
 
       }
     }
+
 
   });
