@@ -39,14 +39,51 @@ storageArea.clear(function (){
 });
 
 function syncAfterLogin(){
+  if (token==null) {
+    alert('token error');
+  }
 // TODO: when you have the fb, sync with previous local data to server.
+  storageArea.get(null,function(result){
+    console.log(result);
 
+
+    for(var key in result){
+      // console.log(key);
+      // console.log(result[key]);
+      var data= result[key];
+      // storageArea.get(key,function(data){
+      //   console.log(data);
+        if(data['user_token']==null){
+          //update the local data
+          data['user_token']=token;
+          var obj ={};
+          obj[data['timestamp']] = data;
+          storageArea.set(obj, function() {
+            // Notify that we saved.
+            // alert('data saved'+obj);
+          });
+
+          //send to server
+          sendDataToServer(data);
+        }
+      //
+      // });
+
+    }
+
+
+
+  });
 
 }
 
 function sendDataToServer(data){
   console.log("sending data to server");
   console.log(data);
+  console.log(data.user_token);
+  console.log(data.url);
+  console.log(data.timestamp);
+  console.log(data.duration);
   $.post('http://procrastinationation.mybluemix.net/event',data, function(  data,  textStatus,  jqXHR ){
     console.log(data);
 
@@ -69,6 +106,7 @@ function saveChanges(timeStamp,uurl,diffMilliTime) {
           if(isSync==false){
             // TODO:
             //send the local data to the server
+            syncAfterLogin();
             isSync = true;
           }
 
@@ -88,6 +126,7 @@ function saveChanges(timeStamp,uurl,diffMilliTime) {
           });
           storageArea.get(null,function(result){
             console.log(result);
+
             //console output = myVariableKeyName {myTestVar:'my test var'}
           });
         }
@@ -181,7 +220,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo){
 
 
   }else {
-    //do
+    //do nothing
 
   }
 
@@ -210,7 +249,12 @@ chrome.browserAction.onClicked.addListener(function(tab) {
         var tabUrl = tab.url;
         console.log(tab.url);
         // alert(tab.url);
-        startPage = tab.url;
+        if(isValidWebsite(tabUrl)){
+
+                    startPage = tab.url;
+                    startTime = new Date();
+                    startTimeDefined = true;
+        }
     });
 
   }
