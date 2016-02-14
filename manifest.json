@@ -16,7 +16,7 @@
 
   "manifest_version": 2,
   "chrome_url_overrides" : {
-        "newtab": "newtab.html"
+        "newtab": "website/index.html"
   },
 
   "content_scripts": [
