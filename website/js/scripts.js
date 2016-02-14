@@ -15,19 +15,19 @@ $(function () {
 
   return array;
 }
-   /* function makePieChart(data) {
+   function makePieChart(data) {
         return {
             type: 'pie',
-            name: 'Time Consumption',
+            name: 'Time Consumption (hours)',
             data: data,
-            center: [100, 80],
-            size: 100,
-            showInLegend: false,
+            center: [150, 80],
+            size: 200,
+            showInLegend: true,
             dataLabels: {
                 enabled: false
             }
         }
-    }*/
+    }
 
    pieChartData = [{
                 name: 'Facebook',
@@ -100,6 +100,26 @@ $(function () {
         // }, makePieChart(pieChartData)]
     };
 
-     $('#container').highcharts(data);
+    data1 = {
+        title: {
+            text: 'Procrastination Stats (hours)'
+        },
+        xAxis: {
+            categories: ['Facebook', 'Google', 'Reddit', 'Twitter', 'Tumblr']
+        },
+        labels: {
+            items: [{
+                style: {
+                    left: '50px',
+                    top: '50px',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                }
+            }]
+        },
 
+        series: [makePieChart(pieChartData)]
+    };
+
+     $('#container').highcharts(data);
+     $('#pie-chart').highcharts(data1);
 });
