@@ -1,15 +1,23 @@
 
-
+function makePieChart(data) {
+    return {
+        type: 'pie',
+        name: 'Time Consumption (hours)',
+        data: data,
+        center: [150, 80],
+        size: 200,
+        showInLegend: true,
+        dataLabels: {
+            enabled: false
+        }
+    }
+}
 
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    console.log(sender.tab ?
-                "from a content script:" + sender.tab.url :
-                "from the extension");
     var token = request.msg;
 
-    console.log(token);
 
     // if (request.msg == "I get the token"){
     //     // document.getElementById('loginButton').disabled=true;
@@ -18,8 +26,71 @@ chrome.runtime.onMessage.addListener(
 /////////////////////////////////////////
 
 var  a = jQuery.post('http://procrastinationation.org/stats/ranking/1',{ user_token: token }, function(data, res) {
-  console.log(data.data);
-  //////
+  var notdata = {
+        title: {
+            text: 'Procrastination Stats (hours)'
+        },
+        xAxis: {
+            //x axis
+            categories: [Object.keys(data.data[0])[0],Object.keys(data.data[1])[0],Object.keys(data.data[2])[0],Object.keys(data.data[3])[0],Object.keys(data.data[4])[0]]
+        },
+        labels: {
+            items: [{
+                html: 'Total Time on Websites',
+                style: {
+                    left: '50px',
+                    top: '18px',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                }
+            }]
+        },
+
+        series: [{
+            type: 'column',
+            name: 'Today',
+            //y axis
+
+            data: [data.data[0][Object.keys(data.data[0])[0]]/(1000 * 60 * 60), data.data[1][Object.keys(data.data[1])[0]]/(1000 * 60 * 60), data.data[2][Object.keys(data.data[2])[0]]/(1000 * 60 * 60), data.data[3][Object.keys(data.data[3])[0]]/(1000 * 60 * 60), data.data[4][Object.keys(data.data[4])[0]]/(1000 * 60 * 60)]
+        }
+        /*, {
+            type: 'column',
+            name: 'This Month',
+            data: [4, 3, 5, 9, 6]
+        }, {
+            type: 'spline',
+            name: 'Average',
+            data: [3, 2.67, 3, 6.33, 3.33],
+            marker: {
+                lineWidth: 2,
+                lineColor: Highcharts.getOptions().colors[3],
+                fillColor: 'white'
+            }
+        }*/
+        ]
+    };
+
+    var notdata1 = {
+        title: {
+            text: 'Procrastination Stats (hours)'
+        },
+        xAxis: {
+            categories: [1,2,3,4,5]
+        },
+        labels: {
+            items: [{
+                style: {
+                    left: '50px',
+                    top: '50px',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                }
+            }]
+        },
+
+        series: [makePieChart(pieChartData)]
+    };
+
+     $('#container').highcharts(notdata);
+     $('#pie-chart').highcharts(notdata1);
 })
 
 
@@ -40,19 +111,6 @@ $(function () {
 
   return array;
 }
-   function makePieChart(data) {
-        return {
-            type: 'pie',
-            name: 'Time Consumption (hours)',
-            data: data,
-            center: [150, 80],
-            size: 200,
-            showInLegend: true,
-            dataLabels: {
-                enabled: false
-            }
-        }
-    }
 
    pieChartData = [{
                 name: 'Facebook',
@@ -81,7 +139,7 @@ $(function () {
 
 
     shuffle(pieChartData);
-
+/*
     data = {
         title: {
             text: 'Procrastination Stats (hours)'
@@ -146,7 +204,7 @@ $(function () {
     };
 
      $('#container').highcharts(data);
-     $('#pie-chart').highcharts(data1);
+     $('#pie-chart').highcharts(data1);*/
 });
 
 
